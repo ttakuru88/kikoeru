@@ -13,7 +13,10 @@ window.onload = function(){
 
   var analyser = audioContext.createAnalyser();
   analyser.fftSize = 128;
-  analyser.connect(audioContext.destination);
+  analyser.connect(audioContext.destination)
+
+  var gainNode = audioContext.createGain();
+  gainNode.connect(analyser)
 
   var canvas        = document.getElementById('visualizer');
   var canvasContext = canvas.getContext('2d');
@@ -28,7 +31,7 @@ window.onload = function(){
       source = audioContext.createBufferSource();
 
       source.buffer = buffer;
-      source.connect(analyser);
+      source.connect(gainNode);
       source.start(0);
 
       animationId = requestAnimationFrame(render);
