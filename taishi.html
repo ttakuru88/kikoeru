@@ -11,12 +11,12 @@ window.onload = function(){
   var audioContext = new (window.AudioContext || window.webkitAudioContext);
   var fileReader   = new FileReader;
 
+  var gainNode = audioContext.createGain();
+  gainNode.connect(audioContext.destination)
+
   var analyser = audioContext.createAnalyser();
   analyser.fftSize = 128;
-  analyser.connect(audioContext.destination)
-
-  var gainNode = audioContext.createGain();
-  gainNode.connect(analyser)
+  analyser.connect(gainNode)
 
   var canvas        = document.getElementById('visualizer');
   var canvasContext = canvas.getContext('2d');
@@ -31,7 +31,7 @@ window.onload = function(){
       source = audioContext.createBufferSource();
 
       source.buffer = buffer;
-      source.connect(gainNode);
+      source.connect(analyser);
       source.start(0);
 
       animationId = requestAnimationFrame(render);
@@ -55,7 +55,6 @@ window.onload = function(){
     }
 
     if(spectrumSum > 0){
-      console.log(5000.0 / spectrumSum, spectrumSum);
       gainNode.gain.value = 5000.0 / spectrumSum;
     }
 
