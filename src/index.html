@@ -2,68 +2,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8" />
-<title>Audio Visualizer</title>
-
-<script>
-window.onload = function(){
-  var source, animationId;
-  var audioContext = new (window.AudioContext || window.webkitAudioContext);
-  var fileReader   = new FileReader;
-
-  var gainNode = audioContext.createGain();
-  gainNode.connect(audioContext.destination)
-
-  var analyser = audioContext.createAnalyser();
-  analyser.fftSize = 128;
-//  analyser.connect(gainNode)
-
-  var canvas        = document.getElementById('visualizer');
-  var canvasContext = canvas.getContext('2d');
-  canvas.setAttribute('width', analyser.frequencyBinCount * 10);
-
-  fileReader.onload = function(){
-    audioContext.decodeAudioData(fileReader.result, function(buffer){
-      if(source) {
-        source.stop();
-        cancelAnimationFrame(animationId);
-      }
-      source = audioContext.createBufferSource();
-
-      source.buffer = buffer;
-      source.connect(gainNode);
-      source.start(0);
-
-      animationId = requestAnimationFrame(render);
-    });
-  };
-
-  document.getElementById('file').addEventListener('change', function(e){
-    fileReader.readAsArrayBuffer(e.target.files[0]);
-  });
-
-  render = function(){
-    var spectrums = new Uint8Array(analyser.frequencyBinCount);
-    analyser.getByteFrequencyData(spectrums);
-
-    canvasContext.clearRect(0, 0, canvas.width, canvas.height);
-
-    var spectrumSum = 0;
-    for(var i=0, len=spectrums.length; i<len; i++){
-      canvasContext.fillRect(i*10, 0, 5, spectrums[i]);
-      spectrumSum += spectrums[i];
-    }
-
-    if(spectrumSum > 0){
-      var ratio = 5000.0 / spectrumSum;
-      gainNode.gain.value = Math.pow(ratio, 1.4);
-    }
-
-    animationId = requestAnimationFrame(render);
-  };
-};
-</script>
-
+  <meta charset="UTF-8" />
+  <title>Audio Visualizer</title>
+  <script src="./jquery.js"></script>
+  <script src="./application.js"></script>
 </head>
 <body>
 
