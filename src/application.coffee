@@ -39,12 +39,15 @@ window.onload = ->
     canvasContext.clearRect(0, 0, canvas.width, canvas.height)
 
     spectrumSum = 0
+    len = spectrums.length
     for spectrum, i in spectrums
-      canvasContext.fillRect(i*10, 0, 5, spectrum)
+      canvasContext.fillRect((len - i - 1)*10, canvas.height - spectrum, 5, spectrum)
       spectrumSum += spectrum
 
     if spectrumSum > 0
       ratio = 1500.0 / spectrumSum
       gainNode.gain.value = Math.pow(ratio, 1.4)
+
+    canvasContext.fillText("x #{Math.round(ratio * 100) / 100}", 10, 10)
 
     animationId = requestAnimationFrame(render)
