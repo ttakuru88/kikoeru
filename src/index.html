@@ -6,14 +6,32 @@
   <title>Audio Visualizer</title>
   <script src="./jquery.js"></script>
   <script src="./application.js"></script>
+  <style>
+    body {
+      font-size: 12px;
+    }
+    h1 {
+      font-size: 18px;
+    }
+    #seek-bar {
+      width: 200px;
+    }
+  </style>
+
 </head>
 <body>
+  <h1>コレは何？</h1>
+  <p>大きい音は小さく、小さい音は大きくして再生する。</p>
 
-音楽ファイルを選択（アップロードは発生しません。）<br>
+  <p>Chromeで動作確認済み</p>
 
-<input id="file" type="file"><br />
+  <h1>音楽ファイル選択</h1>
+  <p>アップロードは発生しません。<p>
 
-<canvas id="visualizer" height="255"></canvas>
+  <input id="file" type="file"><br>
 
+  <canvas id="visualizer" height="255"></canvas><br>
+
+  <input type="range" id="seek-bar">
 </body>
 </html>
