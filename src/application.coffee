@@ -1,13 +1,18 @@
 class SeekBar
   constructor: ->
     @$el = $('#seek-bar')
-    @seekbar     = @$el.find('input')[0]
-    @currentTime = @$el.find('.current-time')[0]
-    @allTime     = @$el.find('.all-time')[0]
+    @seekbar = @$el.find('input')[0]
+
+    @$currentTime = @$el.find('.current-time')
+    @$allTime     = @$el.find('.all-time')
+
+    @$play = @$el.find('.play')
+    @$stop = @$el.find('.stop')
 
     @setMinSeconds(0)
     @setValue(0)
     @setMaxSeconds(0)
+    @stop()
 
     @fixed = false
     @$el.on 'mousemove', =>
@@ -17,13 +22,21 @@ class SeekBar
       @fixed = false
       @$el.removeClass('hover')
 
+  stop: ->
+    @$play.show()
+    @$stop.hide()
+
+  start: ->
+    @$play.hide()
+    @$stop.show()
+
   setSource: (@source) ->
     @setMaxSeconds(@source.buffer.duration)
     @setValue(0)
 
   setValue: (value, silent = false) ->
     @seekbar.value = value
-    @currentTime.innerText = @timeFormat(value)
+    @$currentTime.text(@timeFormat(value))
 
     unless silent
       @startTimeAt = new Date
@@ -37,13 +50,19 @@ class SeekBar
 
   setMaxSeconds: (max) ->
     @seekbar.setAttribute('max', max)
-    @allTime.innerText = @timeFormat(max)
+    @$allTime.text(@timeFormat(max))
 
   setMinSeconds: (min) ->
     @seekbar.setAttribute('min', min)
 
   onChange: (func) ->
-    $(@seekbar).off().on('change', func)
+    $(@seekbar).off('change').on('change', func)
+
+  onClickPlay: (func) ->
+    @$play.off('click').on('click', func)
+
+  onClickStop: (func) ->
+    @$stop.off('click').on('click', func)
 
   timeFormat: (seconds) ->
     minutes = Math.floor(seconds / 60)
@@ -83,11 +102,24 @@ $ ->
     if saveBuffer
       restart(seekBar.seconds())
 
-  restart = (offsetSec) ->
-    gainNode.gain.value = 0
+
+  seekBar.onClickPlay ->
+    return unless saveBuffer
+    restart(seekBar.seconds())
+
+  seekBar.onClickStop ->
+    return unless saveBuffer
+    stop()
+
+  stop = ->
     if source
       source.stop()
       worker.postMessage(null)
+    seekBar.stop()
+
+  restart = (offsetSec) ->
+    gainNode.gain.value = 0
+    stop()
 
     source = audioContext.createBufferSource()
 
@@ -97,6 +129,7 @@ $ ->
 
     seekBar.setSource(source)
     seekBar.setValue(offsetSec)
+    seekBar.start()
 
     source.start(0, offsetSec)
 

@@ -32,6 +32,18 @@
     .hover .current-time{
       outline: solid #888 2px;
     }
+    .controls {
+      width: 60px;
+      display: inline-block;
+    }
+    .play, .stop {
+      font-size: 18px;
+      cursor: pointer;
+    }
+    .stop{
+      transform: scaleX(0.4);
+      display: inline-block;
+    }
     footer{
       margin-top: 80px;
     }
@@ -52,7 +64,15 @@
 
   <canvas id="visualizer" height="255"></canvas><br>
 
-  <div id="seek-bar"><span class="current-time"></span><input type="range"><span class="all-time"></span></div>
+  <div id="seek-bar">
+    <span class="current-time"></span>
+    <div class="controls">
+      <span class="play">▶</span>
+      <span class="stop">■ ■</span>
+    </div>
+    <input type="range">
+    <span class="all-time"></span>
+  </div>
 
 <footer>
   <a href="https://github.com/ttakuru88/kikoeru">https://github.com/ttakuru88/kikoeru</a>

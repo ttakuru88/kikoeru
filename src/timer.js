@@ -1,7 +1,6 @@
 var tid;
 
 onmessage = function(e) {
-  console.log("on message", tid, e.data)
   if(tid) {
     clearInterval(tid);
     tid = null;
