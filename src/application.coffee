@@ -1,30 +1,61 @@
 class SeekBar
   constructor: ->
     @$el = $('#seek-bar')
+    @seekbar     = @$el.find('input')[0]
+    @currentTime = @$el.find('.current-time')[0]
+    @allTime     = @$el.find('.all-time')[0]
+
     @setMinSeconds(0)
     @setValue(0)
+    @setMaxSeconds(0)
+
+    @fixed = false
+    @$el.on 'mousemove', =>
+      @fixed = true
+      @$el.addClass('hover')
+    @$el.on 'mouseleave', =>
+      @fixed = false
+      @$el.removeClass('hover')
 
   setSource: (@source) ->
     @setMaxSeconds(@source.buffer.duration)
     @setValue(0)
 
-  setValue: (value) ->
-    @$el[0].value = value
+  setValue: (value, silent = false) ->
+    @seekbar.value = value
+    @currentTime.innerText = @timeFormat(value)
+
+    unless silent
+      @startTimeAt = new Date
+      @startValue = +value
+
+  update: ->
+    @setValue(@startValue + (new Date - @startTimeAt) / 1000, true)
 
   seconds: ->
-    @$el[0].value
+    @seekbar.value
 
   setMaxSeconds: (max) ->
-    @$el[0].setAttribute('max', max)
+    @seekbar.setAttribute('max', max)
+    @allTime.innerText = @timeFormat(max)
 
   setMinSeconds: (min) ->
-    @$el[0].setAttribute('min', min)
+    @seekbar.setAttribute('min', min)
 
   onChange: (func) ->
-    @$el.off().on('change', func)
+    $(@seekbar).off().on('change', func)
+
+  timeFormat: (seconds) ->
+    minutes = Math.floor(seconds / 60)
+    seconds = Math.floor(seconds) % 60
+
+    minutes = "0#{minutes}" if minutes < 10
+    seconds = "0#{seconds}" if seconds < 10
+
+    "#{minutes}:#{seconds}"
 
 $ ->
-  window.seekBar = new SeekBar
+  seekBar = new SeekBar
   source = null
   animationId = null
   audioContext = new (window.AudioContext || window.webkitAudioContext)
@@ -89,5 +120,8 @@ $ ->
       gainNode.gain.value = Math.pow(ratio, 1.4)
 
       canvasContext.fillText("x #{Math.round(ratio * 100) / 100}", 10, 10)
+
+      unless seekBar.fixed
+        seekBar.update()
 
     animationId = requestAnimationFrame(render)
