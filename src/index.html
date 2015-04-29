@@ -44,6 +44,10 @@
       transform: scaleX(0.4);
       display: inline-block;
     }
+    #properties .title{
+      width: 50px;
+      display: inline-block;
+    }
     footer{
       margin-top: 80px;
     }
@@ -72,6 +76,15 @@
     </div>
     <input type="range">
     <span class="all-time"></span>
+  </div>
+
+  <ul id="properties">
+    <li class="base">
+      <div class="title">しきい</div><input type="range" min="500" max="3000" step="50" value="1500"> <span class="preview"></span>
+    </li>
+    <li class="weight">
+      <div class="title">重み</div><input type="range" min="1.0" max="3.0" step="0.1" value="1.4"> <span class="preview"></span>
+    </li>
   </div>
 
 <footer>

@@ -73,6 +73,19 @@ class SeekBar
 
     "#{minutes}:#{seconds}"
 
+class Property
+  constructor: (@$el) ->
+    @el = @$el[0]
+    @$preview = @$el.find(".preview")
+    @$bar = @$el.find('input[type=range]')
+
+    @set(@$bar[0].value)
+    @$bar.off('change').on 'change', (e) =>
+      @set(@$bar[0].value)
+
+  set: (@value) ->
+    @$preview.text(@value)
+
 $ ->
   seekBar = new SeekBar
   source = null
@@ -81,6 +94,9 @@ $ ->
   worker = new Worker("timer.js")
   worker.onmessage = (e) ->
     render()
+
+  baseProp   = new Property($('#properties .base'))
+  weightProp = new Property($('#properties .weight'))
 
   gainNode = audioContext.createGain()
   gainNode.connect(audioContext.destination)
@@ -101,7 +117,6 @@ $ ->
   seekBar.onChange ->
     if saveBuffer
       restart(seekBar.seconds())
-
 
   seekBar.onClickPlay ->
     return unless saveBuffer
@@ -151,10 +166,11 @@ $ ->
       spectrumSum += spectrum
 
     if spectrumSum > 0
-      ratio = 1500.0 / spectrumSum
-      gainNode.gain.value = Math.pow(ratio, 1.4)
+      ratio = baseProp.value / spectrumSum
+      gainNode.gain.value = Math.pow(ratio, weightProp.value)
 
-      canvasContext.fillText("x #{Math.round(ratio * 100) / 100}", 10, 10)
+      canvasContext.fillText("vol: #{spectrumSum}", 10, 10)
+      canvasContext.fillText("x#{Math.round(ratio * 100) / 100}", 10, 30)
 
       unless seekBar.fixed
         seekBar.update()
