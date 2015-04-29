@@ -9,7 +9,7 @@ module.exports = (grunt) ->
         files: ['src/*.coffee']
       html:
         tasks: ['copy']
-        files: ['src/index.html']
+        files: ['src/index.html', 'src/timer.js']
     coffee:
       main:
         files:
@@ -18,6 +18,7 @@ module.exports = (grunt) ->
       main:
         files:
           'dist/index.html': 'src/index.html'
+          'dist/timer.js': 'src/timer.js'
           'dist/jquery.js': 'bower_components/jquery/dist/jquery.min.js'
 
   grunt.registerTask 'default', ['clean', 'coffee', 'copy']

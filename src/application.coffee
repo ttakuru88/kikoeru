@@ -57,9 +57,11 @@ class SeekBar
 $ ->
   seekBar = new SeekBar
   source = null
-  animationId = null
   audioContext = new (window.AudioContext || window.webkitAudioContext)
   fileReader   = new FileReader
+  worker = new Worker("timer.js")
+  worker.onmessage = (e) ->
+    render()
 
   gainNode = audioContext.createGain()
   gainNode.connect(audioContext.destination)
@@ -79,13 +81,13 @@ $ ->
 
   seekBar.onChange ->
     if saveBuffer
-      gainNode.gain.value = 0
       restart(seekBar.seconds())
 
   restart = (offsetSec) ->
+    gainNode.gain.value = 0
     if source
       source.stop()
-      cancelAnimationFrame(animationId)
+      worker.postMessage(null)
 
     source = audioContext.createBufferSource()
 
@@ -98,7 +100,7 @@ $ ->
 
     source.start(0, offsetSec)
 
-    animationId = requestAnimationFrame(render)
+    worker.postMessage(Math.floor(1000 / 30))
 
   document.getElementById('file').addEventListener 'change', (e) ->
     fileReader.readAsArrayBuffer(e.target.files[0])
@@ -123,5 +125,3 @@ $ ->
 
       unless seekBar.fixed
         seekBar.update()
-
-    animationId = requestAnimationFrame(render)
